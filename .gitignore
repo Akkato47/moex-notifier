@@ -1,0 +1,22 @@
+# binaries
+bin/
+
+# env files
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# generated
+gen/
+
+# OS
+.DS_Store
+
+# Local docs
+PROJECT.md
+docs/

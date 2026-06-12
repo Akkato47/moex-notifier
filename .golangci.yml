@@ -1,0 +1,27 @@
+version: "2"
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gofmt
+    - goimports
+    - misspell
+    - revive
+    - exhaustive
+
+formatters:
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/Akkato47/moex-notifier
+
+exclusions:
+  rules:
+    - path: gen/
+      linters:
+        - all
