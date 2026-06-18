@@ -1,4 +1,4 @@
-package moex
+package services
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Akkato47/moex-notifier/internal/ingester/features/backfill/domain"
+	"github.com/Akkato47/moex-notifier/internal/ingester/features/candle/domain"
 )
 
 type moexResponse struct {
@@ -18,16 +18,16 @@ type moexResponse struct {
 	} `json:"candles"`
 }
 
-type Client struct {
+type MoexClient struct {
 	client  *http.Client
 	baseURL string
 }
 
-func New(client *http.Client, baseURL string) *Client {
-	return &Client{client: client, baseURL: baseURL}
+func NewMoexClient(client *http.Client, baseURL string) *MoexClient {
+	return &MoexClient{client: client, baseURL: baseURL}
 }
 
-func (c *Client) GetCandlesByPeriod(ctx context.Context, ticker string, from, to time.Time) ([]domain.Candle, error) {
+func (c *MoexClient) GetCandlesByPeriod(ctx context.Context, ticker string, from, to time.Time) ([]domain.Candle, error) {
 	endpoint := fmt.Sprintf(
 		"%s/engines/stock/markets/shares/boards/TQBR/securities/%s/candles.json",
 		c.baseURL, ticker,
