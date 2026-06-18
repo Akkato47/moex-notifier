@@ -1,4 +1,31 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: moex
+      POSTGRES_PASSWORD: moex
+      POSTGRES_DB: moex
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3-alpine
+    environment:
+      CLICKHOUSE_USER: moex
+      CLICKHOUSE_PASSWORD: moex
+      CLICKHOUSE_DB: default
+    ports:
+      - "8123:8123" # HTTP interface
+      - "9000:9000" # Native protocol (used by clickhouse-go)
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -16,30 +43,6 @@ services:
     ports:
       - "9092:9092"
 
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: moex
-      POSTGRES_PASSWORD: moex
-      POSTGRES_DB: moex
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  clickhouse:
-    image: clickhouse/clickhouse-server:latest
-    ports:
-      - "8123:8123"
-      - "9000:9000"
-    volumes:
-      - clickhouse_data:/var/lib/clickhouse
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -54,28 +57,25 @@ services:
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
+      - grafana_data:/var/lib/grafana
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
 
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "16686:16686"
-      - "4317:4317"
+      - "16686:16686" # Jaeger UI
+      - "4317:4317" # OTLP gRPC
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3.0.0
     ports:
       - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./loki/loki-config.yml:/etc/loki/local-config.yaml
-
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - /var/log:/var/log
-    command: -config.file=/etc/promtail/config.yml
 
 volumes:
   postgres_data:
   clickhouse_data:
+  grafana_data:
